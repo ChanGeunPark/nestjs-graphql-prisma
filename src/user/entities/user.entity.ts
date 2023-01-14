@@ -1,17 +1,23 @@
-import { ObjectType, Field, Int } from '@nestjs/graphql';
+import { ObjectType, Field, Int, registerEnumType } from '@nestjs/graphql';
 import { CoreEntity } from 'src/common/entities/core.entity';
 
-type UserRole = 'client' | 'owner' | 'delivery';
+export enum UserRole {
+  Client = 'Client',
+  Owner = 'Owner',
+  Delivery = 'Delivery',
+}
+
+registerEnumType(UserRole, { name: 'UserRole' });
 
 @ObjectType()
 export class User extends CoreEntity {
   // extends CoreEntity(통일된 값들)를 상속받는다.
-  @Field()
+  @Field((type) => String)
   email: string;
 
-  @Field()
+  @Field((type) => String)
   password: string;
 
-  @Field()
+  @Field((type) => UserRole)
   role: UserRole;
 }

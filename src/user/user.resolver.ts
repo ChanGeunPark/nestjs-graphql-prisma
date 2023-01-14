@@ -1,19 +1,41 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { UserService } from './user.service';
 import { User } from './entities/user.entity';
-import { CreateUserInput } from './dto/create-user.input';
+import { CreateUserOutput, CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
+import { LoginInput, LoginOutput } from './dto/login.dto';
 
-@Resolver(() => User)
+@Resolver((of) => User)
 export class UserResolver {
   constructor(private readonly userService: UserService) {}
 
-  @Mutation(() => User)
-  createUser(@Args('createUserInput') createUserInput: CreateUserInput) {
-    return this.userService.create(createUserInput);
+  @Mutation((returns) => CreateUserOutput) // Mutation의 return type을 직접 정의한다.
+  async createUser(
+    @Args('createUserInput') createUserInput: CreateUserInput,
+  ): Promise<CreateUserOutput> {
+    try {
+      return await this.userService.create(createUserInput);
+    } catch (e) {
+      return {
+        error: e,
+        ok: false,
+      };
+    }
   }
 
-  @Query(() => [User], { name: 'user' })
+  @Mutation((returns) => LoginOutput)
+  async login(@Args('input') loginInput: LoginInput): Promise<LoginOutput> {
+    try {
+      return await this.userService.login(loginInput);
+    } catch (error) {
+      return {
+        ok: false,
+        error,
+      };
+    }
+  }
+
+  @Query(() => [User], { name: 'users' })
   findAll() {
     return this.userService.findAll();
   }

@@ -1,12 +1,12 @@
-import { Field, Int } from '@nestjs/graphql';
+import { Field } from '@nestjs/graphql';
 
 export class CoreEntity {
-  @Field(() => Int)
+  @Field(() => Number)
   id: number;
 
-  @Field()
+  @Field(() => Date)
   createdAt: Date;
 
-  @Field()
+  @Field(() => Date)
   updatedAt: Date;
 }

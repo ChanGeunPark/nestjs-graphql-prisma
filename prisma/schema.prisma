@@ -10,26 +10,18 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Todo{
-  id        Int      @id @default(autoincrement())
-  title     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 model User{
   id      Int      @id @default(autoincrement())
   email  String   @unique
   password String
-  role    RoleStatus
+  role    RoleStatus @default(Client)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
 }
 
-
 enum RoleStatus {
-  client
-  owner
-  delivery
+  Client
+  Owner
+  Delivery
 }

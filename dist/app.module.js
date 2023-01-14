@@ -11,8 +11,9 @@ const apollo_1 = require("@nestjs/apollo");
 const common_1 = require("@nestjs/common");
 const graphql_1 = require("@nestjs/graphql");
 const path_1 = require("path");
-const todo_module_1 = require("./todo/todo.module");
 const prisma_service_1 = require("./prisma/prisma.service");
+const user_module_1 = require("./user/user.module");
+const common_module_1 = require("./common/common.module");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -22,7 +23,8 @@ AppModule = __decorate([
                 driver: apollo_1.ApolloDriver,
                 autoSchemaFile: (0, path_1.join)(process.cwd(), 'src/schema.gql'),
             }),
-            todo_module_1.TodoModule,
+            user_module_1.UserModule,
+            common_module_1.CommonModule,
         ],
         controllers: [],
         providers: [prisma_service_1.PrismaService],
