@@ -1,0 +1,9 @@
+services:
+db:
+image: postgres:latest
+ports:
+  - '5433:5433'
+environment:
+  - POSTGRES_PASSWORD=12345
+  - POSTGRES_USER=parkchangeun
+  - POSTGRES_DB=nuber-eats
