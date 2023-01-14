@@ -16,3 +16,20 @@ model Todo{
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model User{
+  id      Int      @id @default(autoincrement())
+  email  String   @unique
+  password String
+  role    RoleStatus
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+}
+
+
+enum RoleStatus {
+  client
+  owner
+  delivery
+}
