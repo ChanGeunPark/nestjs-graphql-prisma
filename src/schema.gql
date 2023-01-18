@@ -2,27 +2,56 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type Todo {
-  id: Int!
-  title: String!
+type User {
+  email: String!
+  password: String!
+  role: UserRole!
+}
+
+enum UserRole {
+  Client
+  Owner
+  Delivery
+}
+
+type CreateUserOutput {
+  error: String
+  ok: Boolean!
+}
+
+type LoginOutput {
+  error: String
+  ok: Boolean!
+  token: String
 }
 
 type Query {
-  todos: [Todo!]!
-  todo(id: Int!): Todo!
+  users: [User!]!
+  user(id: Int!): User!
+  me: User!
 }
 
 type Mutation {
-  createTodo(createTodoInput: CreateTodoInput!): Todo!
-  updateTodo(updateTodoInput: UpdateTodoInput!): Todo!
-  removeTodo(id: Int!): Todo!
+  createUser(createUserInput: CreateUserInput!): CreateUserOutput!
+  login(input: LoginInput!): LoginOutput!
+  updateUser(updateUserInput: UpdateUserInput!): User!
+  removeUser(id: Int!): User!
 }
 
-input CreateTodoInput {
-  title: String!
+input CreateUserInput {
+  email: String!
+  password: String!
+  role: UserRole!
 }
 
-input UpdateTodoInput {
-  title: String!
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+input UpdateUserInput {
+  email: String
+  password: String
+  role: UserRole
   id: Int!
 }

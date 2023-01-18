@@ -11,18 +11,42 @@ const apollo_1 = require("@nestjs/apollo");
 const common_1 = require("@nestjs/common");
 const graphql_1 = require("@nestjs/graphql");
 const path_1 = require("path");
-const todo_module_1 = require("./todo/todo.module");
 const prisma_service_1 = require("./prisma/prisma.service");
+const user_module_1 = require("./user/user.module");
+const common_module_1 = require("./common/common.module");
+const config_1 = require("@nestjs/config");
+const jwt_module_1 = require("./jwt/jwt.module");
+const Joi = require("joi");
+const jwt_middleware_1 = require("./jwt/jwt.middleware");
 let AppModule = class AppModule {
+    configure(consumer) {
+        consumer.apply(jwt_middleware_1.JwtMiddleWare).forRoutes({
+            path: '/graphql',
+            method: common_1.RequestMethod.ALL,
+        });
+    }
 };
 AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
+            config_1.ConfigModule.forRoot({
+                isGlobal: true,
+                envFilePath: process.env.NODE_ENV === 'dev' ? '.env.dev' : '.env.test',
+                ignoreEnvFile: process.env.NODE_ENV === 'prod',
+                validationSchema: Joi.object({
+                    DATABASE_URL: Joi.string().required(),
+                    PRIVATE_KEY: Joi.string().required(),
+                }),
+            }),
             graphql_1.GraphQLModule.forRoot({
                 driver: apollo_1.ApolloDriver,
                 autoSchemaFile: (0, path_1.join)(process.cwd(), 'src/schema.gql'),
             }),
-            todo_module_1.TodoModule,
+            jwt_module_1.JwtModule.forRoot({
+                privateKey: process.env.PRIVATE_KEY,
+            }),
+            user_module_1.UserModule,
+            common_module_1.CommonModule,
         ],
         controllers: [],
         providers: [prisma_service_1.PrismaService],

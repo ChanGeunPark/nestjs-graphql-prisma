@@ -18,3 +18,21 @@ $ npm run start:prod
 ```
 DATABASE_URL="postgresql://<user-name>:<password>@localhost:<port>/<db-name>?schema=public"
 ```
+
+## User Model :
+
+- id
+- createdAt
+- updatedAt
+
+- email
+- password
+- role(client|owner|delivery)
+
+# User CRUD:
+
+- Create Account
+- Log In
+- See Profile
+- Edit Profile
+- Verify Email
