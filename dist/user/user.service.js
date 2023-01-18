@@ -13,9 +13,11 @@ exports.UserService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
 const bcrypt = require("bcrypt");
+const jwt_service_1 = require("../jwt/jwt.service");
 let UserService = class UserService {
-    constructor(prisma) {
+    constructor(prisma, jwtService) {
         this.prisma = prisma;
+        this.jwtService = jwtService;
     }
     async create({ email, password, role, }) {
         try {
@@ -61,9 +63,10 @@ let UserService = class UserService {
                     error: 'Wrong password',
                 };
             }
+            const token = this.jwtService.sign({ id: user.id });
             return {
                 ok: true,
-                token: 'asdfasdf',
+                token,
             };
         }
         catch (error) {
@@ -85,10 +88,18 @@ let UserService = class UserService {
     remove(id) {
         return `This action removes a #${id} user`;
     }
+    async findById(id) {
+        return this.prisma.user.findUnique({
+            where: {
+                id,
+            },
+        });
+    }
 };
 UserService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        jwt_service_1.JwtService])
 ], UserService);
 exports.UserService = UserService;
 //# sourceMappingURL=user.service.js.map

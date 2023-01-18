@@ -51,6 +51,7 @@ let UserResolver = class UserResolver {
     findOne(id) {
         return this.userService.findOne(id);
     }
+    me() { }
     updateUser(updateUserInput) {
         return this.userService.update(updateUserInput.id, updateUserInput);
     }
@@ -85,6 +86,12 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], UserResolver.prototype, "findOne", null);
+__decorate([
+    (0, graphql_1.Query)(() => user_entity_1.User),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], UserResolver.prototype, "me", null);
 __decorate([
     (0, graphql_1.Mutation)(() => user_entity_1.User),
     __param(0, (0, graphql_1.Args)('updateUserInput')),

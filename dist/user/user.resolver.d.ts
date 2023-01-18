@@ -9,6 +9,7 @@ export declare class UserResolver {
     login(loginInput: LoginInput): Promise<LoginOutput>;
     findAll(): import(".prisma/client").PrismaPromise<import(".prisma/client").User[]>;
     findOne(id: number): string;
+    me(): void;
     updateUser(updateUserInput: UpdateUserInput): string;
     removeUser(id: number): string;
 }

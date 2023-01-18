@@ -45,6 +45,9 @@ export class UserResolver {
     return this.userService.findOne(id);
   }
 
+  @Query(() => User)
+  me() {}
+
   @Mutation(() => User)
   updateUser(@Args('updateUserInput') updateUserInput: UpdateUserInput) {
     return this.userService.update(updateUserInput.id, updateUserInput);

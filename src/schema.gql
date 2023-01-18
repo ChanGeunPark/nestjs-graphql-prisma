@@ -28,6 +28,7 @@ type LoginOutput {
 type Query {
   users: [User!]!
   user(id: Int!): User!
+  me: User!
 }
 
 type Mutation {

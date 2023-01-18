@@ -11,11 +11,13 @@ const common_1 = require("@nestjs/common");
 const user_service_1 = require("./user.service");
 const user_resolver_1 = require("./user.resolver");
 const prisma_service_1 = require("../prisma/prisma.service");
+const config_1 = require("@nestjs/config");
 let UserModule = class UserModule {
 };
 UserModule = __decorate([
     (0, common_1.Module)({
-        providers: [user_resolver_1.UserResolver, user_service_1.UserService, prisma_service_1.PrismaService],
+        providers: [user_resolver_1.UserResolver, user_service_1.UserService, prisma_service_1.PrismaService, config_1.ConfigService],
+        exports: [user_service_1.UserService],
     })
 ], UserModule);
 exports.UserModule = UserModule;
