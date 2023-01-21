@@ -11,13 +11,29 @@ model User{
   id        Int      @id @default(autoincrement())
   email     String   @unique
   password  String
-  role      RoleStatus @default(Client)
+  role      RoleStatus 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  verification Verification?
 }
 
+
+model Verification{
+  id        Int      @id @default(autoincrement())
+  code      String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int      @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+
+// Enums
 enum RoleStatus {
   Client
   Owner
   Delivery
 }
+

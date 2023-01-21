@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+
+//dio
 import { CreateUserInput } from './dto/create-user.input';
-import { UpdateUserInput } from './dto/update-user.input';
-import * as bcrypt from 'bcrypt';
 import { LoginInput } from './dto/login.dto';
-import * as jwt from 'jsonwebtoken';
-import { ConfigService } from '@nestjs/config';
+import { EditProfileInput } from './dto/edit-profile.dto';
+
+import * as bcrypt from 'bcrypt';
 import { JwtService } from 'src/jwt/jwt.service';
 import { User } from 'src/interfaces/users';
 
@@ -78,7 +79,7 @@ export class UserService {
       }
 
       // JWT(json web token) 를 생성한다.
-      const token = this.jwtService.sign({ id: user.id });
+      const token = this.jwtService.sign(user.id);
 
       return {
         ok: true,
@@ -96,14 +97,6 @@ export class UserService {
     return this.prisma.user.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
-
-  update(id: number, updateUserInput: UpdateUserInput) {
-    return `This action updates a #${id} user`;
-  }
-
   remove(id: number) {
     return `This action removes a #${id} user`;
   }
@@ -114,5 +107,36 @@ export class UserService {
         id,
       },
     });
+  }
+
+  async editProfile(userId: number, editProfileInput: EditProfileInput) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+      });
+      if (user) {
+        const hashPassword = await bcrypt.hash(editProfileInput.password, 10);
+
+        await this.prisma.user.update({
+          where: {
+            id: userId,
+          },
+          data: {
+            email: editProfileInput.email,
+            password: editProfileInput.password ? hashPassword : user.password,
+          },
+        });
+      } else {
+        throw Error();
+      }
+      return { ok: true };
+    } catch (e) {
+      return {
+        ok: false,
+        error: "Couldn't update profile",
+      };
+    }
   }
 }

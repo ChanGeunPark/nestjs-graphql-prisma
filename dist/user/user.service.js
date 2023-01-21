@@ -63,7 +63,7 @@ let UserService = class UserService {
                     error: 'Wrong password',
                 };
             }
-            const token = this.jwtService.sign({ id: user.id });
+            const token = this.jwtService.sign(user.id);
             return {
                 ok: true,
                 token,
@@ -79,12 +79,6 @@ let UserService = class UserService {
     findAll() {
         return this.prisma.user.findMany();
     }
-    findOne(id) {
-        return `This action returns a #${id} user`;
-    }
-    update(id, updateUserInput) {
-        return `This action updates a #${id} user`;
-    }
     remove(id) {
         return `This action removes a #${id} user`;
     }
@@ -94,6 +88,37 @@ let UserService = class UserService {
                 id,
             },
         });
+    }
+    async editProfile(userId, editProfileInput) {
+        try {
+            const user = await this.prisma.user.findUnique({
+                where: {
+                    id: userId,
+                },
+            });
+            if (user) {
+                const hashPassword = await bcrypt.hash(editProfileInput.password, 10);
+                await this.prisma.user.update({
+                    where: {
+                        id: userId,
+                    },
+                    data: {
+                        email: editProfileInput.email,
+                        password: editProfileInput.password ? hashPassword : user.password,
+                    },
+                });
+            }
+            else {
+                throw Error();
+            }
+            return { ok: true };
+        }
+        catch (e) {
+            return {
+                ok: false,
+                error: "Couldn't update profile",
+            };
+        }
     }
 };
 UserService = __decorate([

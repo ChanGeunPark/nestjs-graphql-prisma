@@ -14,6 +14,7 @@ import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from './jwt/jwt.module';
 import * as Joi from 'joi';
 import { JwtMiddleWare } from './jwt/jwt.middleware';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -34,15 +35,20 @@ import { JwtMiddleWare } from './jwt/jwt.middleware';
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
 
-      // autoSchemaFile: true,
-      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      autoSchemaFile: true,
+      // autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+
+      /**
+       * @description context는 어떤 resolver에서든 접근할 수 있다.
+       *  jwt를 통해 user를 얻어서 context에 넣어준다.
+       */
+      context: ({ req }) => ({ user: req['user'] }),
     }),
     // 모듈을 dynamic 하게 import 할 수 있게 변경
     JwtModule.forRoot({
       privateKey: process.env.PRIVATE_KEY,
     }),
     UserModule,
-    CommonModule,
   ],
   controllers: [],
   providers: [PrismaService],
@@ -54,7 +60,7 @@ export class AppModule implements NestModule {
     consumer.apply(JwtMiddleWare).forRoutes({
       path: '/graphql',
       // path: '*',
-      method: RequestMethod.ALL,
+      method: RequestMethod.POST,
     });
 
     // exclude를 사용하면 해당 경로는 middleware를 적용하지 않는다.

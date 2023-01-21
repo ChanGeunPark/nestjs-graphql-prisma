@@ -11,8 +11,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CoreEntity = void 0;
 const graphql_1 = require("@nestjs/graphql");
-class CoreEntity {
-}
+let CoreEntity = class CoreEntity {
+};
 __decorate([
     (0, graphql_1.Field)(() => Number),
     __metadata("design:type", Number)
@@ -25,5 +25,8 @@ __decorate([
     (0, graphql_1.Field)(() => Date),
     __metadata("design:type", Date)
 ], CoreEntity.prototype, "updatedAt", void 0);
+CoreEntity = __decorate([
+    (0, graphql_1.ObjectType)()
+], CoreEntity);
 exports.CoreEntity = CoreEntity;
 //# sourceMappingURL=core.entity.js.map

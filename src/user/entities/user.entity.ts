@@ -19,5 +19,5 @@ export class User extends CoreEntity {
   password: string;
 
   @Field((type) => UserRole)
-  role: UserRole;
+  role: 'Client' | 'Owner' | 'Delivery';
 }
