@@ -9,20 +9,20 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MutationOutput = void 0;
+exports.CoreOutput = void 0;
 const graphql_1 = require("@nestjs/graphql");
-let MutationOutput = class MutationOutput {
+let CoreOutput = class CoreOutput {
 };
 __decorate([
     (0, graphql_1.Field)(() => String, { nullable: true }),
     __metadata("design:type", String)
-], MutationOutput.prototype, "error", void 0);
+], CoreOutput.prototype, "error", void 0);
 __decorate([
     (0, graphql_1.Field)(() => Boolean),
     __metadata("design:type", Boolean)
-], MutationOutput.prototype, "ok", void 0);
-MutationOutput = __decorate([
+], CoreOutput.prototype, "ok", void 0);
+CoreOutput = __decorate([
     (0, graphql_1.ObjectType)()
-], MutationOutput);
-exports.MutationOutput = MutationOutput;
+], CoreOutput);
+exports.CoreOutput = CoreOutput;
 //# sourceMappingURL=output.dto.js.map

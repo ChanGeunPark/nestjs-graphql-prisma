@@ -16,7 +16,7 @@ CreateUserInput = __decorate([
     (0, graphql_1.InputType)()
 ], CreateUserInput);
 exports.CreateUserInput = CreateUserInput;
-let CreateUserOutput = class CreateUserOutput extends output_dto_1.MutationOutput {
+let CreateUserOutput = class CreateUserOutput extends output_dto_1.CoreOutput {
 };
 CreateUserOutput = __decorate([
     (0, graphql_1.ObjectType)()

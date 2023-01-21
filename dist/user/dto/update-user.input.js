@@ -9,9 +9,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UpdateUserInput = void 0;
+exports.UpdateUserOutput = exports.UpdateUserInput = void 0;
 const create_user_input_1 = require("./create-user.input");
 const graphql_1 = require("@nestjs/graphql");
+const output_dto_1 = require("../../common/dtos/output.dto");
 let UpdateUserInput = class UpdateUserInput extends (0, graphql_1.PartialType)(create_user_input_1.CreateUserInput) {
 };
 __decorate([
@@ -22,4 +23,10 @@ UpdateUserInput = __decorate([
     (0, graphql_1.InputType)()
 ], UpdateUserInput);
 exports.UpdateUserInput = UpdateUserInput;
+let UpdateUserOutput = class UpdateUserOutput extends output_dto_1.CoreOutput {
+};
+UpdateUserOutput = __decorate([
+    (0, graphql_1.ObjectType)()
+], UpdateUserOutput);
+exports.UpdateUserOutput = UpdateUserOutput;
 //# sourceMappingURL=update-user.input.js.map
