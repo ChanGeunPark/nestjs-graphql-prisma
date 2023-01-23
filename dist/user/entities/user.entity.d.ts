@@ -7,5 +7,6 @@ export declare enum UserRole {
 export declare class User extends CoreEntity {
     email: string;
     password: string;
+    verified?: boolean;
     role: 'Client' | 'Owner' | 'Delivery';
 }

@@ -16,6 +16,8 @@ const config_1 = require("@nestjs/config");
 const jwt_module_1 = require("./jwt/jwt.module");
 const Joi = require("joi");
 const jwt_middleware_1 = require("./jwt/jwt.middleware");
+const apollo_server_core_1 = require("apollo-server-core");
+const mail_module_1 = require("./mail/mail.module");
 let AppModule = class AppModule {
     configure(consumer) {
         consumer.apply(jwt_middleware_1.JwtMiddleWare).forRoutes({
@@ -34,17 +36,27 @@ AppModule = __decorate([
                 validationSchema: Joi.object({
                     DATABASE_URL: Joi.string().required(),
                     PRIVATE_KEY: Joi.string().required(),
+                    MAIL_API_KEY: Joi.string().required(),
+                    MAIL_DOMAIN_NAME: Joi.string().required(),
+                    MAIL_FROM_EMAIL: Joi.string().required(),
                 }),
             }),
             graphql_1.GraphQLModule.forRoot({
                 driver: apollo_1.ApolloDriver,
+                playground: false,
                 autoSchemaFile: true,
+                plugins: [(0, apollo_server_core_1.ApolloServerPluginLandingPageLocalDefault)()],
                 context: ({ req }) => ({ user: req['user'] }),
             }),
             jwt_module_1.JwtModule.forRoot({
                 privateKey: process.env.PRIVATE_KEY,
             }),
             user_module_1.UserModule,
+            mail_module_1.MailModule.forRoot({
+                apiKey: process.env.MAIL_API_KEY,
+                domain: process.env.MAIL_DOMAIN_NAME,
+                fromEmail: process.env.MAIL_FROM_EMAIL,
+            }),
         ],
         controllers: [],
         providers: [prisma_service_1.PrismaService],

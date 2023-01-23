@@ -12,12 +12,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
-const bcrypt = require("bcrypt");
 const jwt_service_1 = require("../jwt/jwt.service");
+const uuid_1 = require("uuid");
+const bcrypt = require("bcrypt");
+const mail_service_1 = require("../mail/mail.service");
 let UserService = class UserService {
-    constructor(prisma, jwtService) {
+    constructor(prisma, jwtService, mailService) {
         this.prisma = prisma;
         this.jwtService = jwtService;
+        this.mailService = mailService;
     }
     async create({ email, password, role, }) {
         try {
@@ -30,13 +33,24 @@ let UserService = class UserService {
                 return { ok: false, error: 'There is a user with that email already' };
             }
             const hashPassword = await bcrypt.hash(password, 10);
-            await this.prisma.user.create({
+            const user = await this.prisma.user.create({
                 data: {
                     email,
                     password: hashPassword,
                     role,
                 },
             });
+            const verification = await this.prisma.verification.create({
+                data: {
+                    code: (0, uuid_1.v4)().replace(/-/g, ''),
+                    user: {
+                        connect: {
+                            id: user.id,
+                        },
+                    },
+                },
+            });
+            this.mailService.sendVerificationEmail(user.email, verification.code);
             return { ok: true };
         }
         catch (e) {
@@ -83,11 +97,22 @@ let UserService = class UserService {
         return `This action removes a #${id} user`;
     }
     async findById(id) {
-        return this.prisma.user.findUnique({
-            where: {
-                id,
-            },
-        });
+        try {
+            const user = await this.prisma.user.findUnique({
+                where: {
+                    id,
+                },
+            });
+            if (user) {
+                return {
+                    ok: true,
+                    user,
+                };
+            }
+        }
+        catch (error) {
+            return { ok: false, error: 'User not found' };
+        }
     }
     async editProfile(userId, editProfileInput) {
         try {
@@ -96,8 +121,19 @@ let UserService = class UserService {
                     id: userId,
                 },
             });
-            if (user) {
+            if (user && user.email !== editProfileInput.email) {
                 const hashPassword = await bcrypt.hash(editProfileInput.password, 10);
+                const verification = await this.prisma.verification.create({
+                    data: {
+                        code: (0, uuid_1.v4)().replace(/-/g, ''),
+                        user: {
+                            connect: {
+                                id: user.id,
+                            },
+                        },
+                    },
+                });
+                this.mailService.sendVerificationEmail(user.email, verification.code);
                 await this.prisma.user.update({
                     where: {
                         id: userId,
@@ -120,11 +156,49 @@ let UserService = class UserService {
             };
         }
     }
+    async verifyEmail(code) {
+        const verification = await this.prisma.verification.findFirst({
+            where: {
+                code,
+            },
+            include: {
+                user: true,
+            },
+        });
+        try {
+            if (verification) {
+                await this.prisma.user.update({
+                    where: {
+                        id: verification.user.id,
+                    },
+                    data: {
+                        verified: true,
+                    },
+                });
+                await this.prisma.verification.delete({
+                    where: {
+                        id: verification.id,
+                    },
+                });
+                return {
+                    ok: true,
+                };
+            }
+            return { ok: false, error: 'Verification not found' };
+        }
+        catch (error) {
+            return {
+                ok: false,
+                error,
+            };
+        }
+    }
 };
 UserService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
-        jwt_service_1.JwtService])
+        jwt_service_1.JwtService,
+        mail_service_1.MailService])
 ], UserService);
 exports.UserService = UserService;
 //# sourceMappingURL=user.service.js.map

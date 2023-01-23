@@ -23,31 +23,16 @@ const auth_guard_1 = require("../auth/auth.guard");
 const auth_user_decorator_1 = require("../auth/auth-user.decorator");
 const user_profile_dto_1 = require("./dto/user-profile.dto");
 const edit_profile_dto_1 = require("./dto/edit-profile.dto");
+const verify_email_dto_1 = require("./dto/verify-email.dto");
 let UserResolver = class UserResolver {
     constructor(userService) {
         this.userService = userService;
     }
-    async createUser(createUserInput) {
-        try {
-            return await this.userService.create(createUserInput);
-        }
-        catch (e) {
-            return {
-                error: e,
-                ok: false,
-            };
-        }
+    createUser(createUserInput) {
+        return this.userService.create(createUserInput);
     }
-    async login(loginInput) {
-        try {
-            return await this.userService.login(loginInput);
-        }
-        catch (error) {
-            return {
-                ok: false,
-                error,
-            };
-        }
+    login(loginInput) {
+        return this.userService.login(loginInput);
     }
     findAll() {
         return this.userService.findAll();
@@ -55,37 +40,17 @@ let UserResolver = class UserResolver {
     me(authUser) {
         return authUser;
     }
-    async userProfile(userProfileInput) {
-        try {
-            const user = await this.userService.findById(userProfileInput.userId);
-            if (!user) {
-                throw Error();
-            }
-            return {
-                ok: Boolean(user),
-                user,
-            };
-        }
-        catch (e) {
-            return {
-                error: 'User Not Found',
-                ok: false,
-            };
-        }
+    userProfile(userProfileInput) {
+        return this.userService.findById(userProfileInput.userId);
     }
-    async editProfile(authUser, editProfileInput) {
-        try {
-            return await this.userService.editProfile(authUser.id, editProfileInput);
-        }
-        catch (e) {
-            return {
-                error: e,
-                ok: false,
-            };
-        }
+    editProfile(authUser, editProfileInput) {
+        return this.userService.editProfile(authUser.id, editProfileInput);
     }
     removeUser(id) {
         return this.userService.remove(id);
+    }
+    verifyEmail(verifyEmailInput) {
+        return this.userService.verifyEmail(verifyEmailInput.code);
     }
 };
 __decorate([
@@ -141,6 +106,13 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], UserResolver.prototype, "removeUser", null);
+__decorate([
+    (0, graphql_1.Mutation)(() => verify_email_dto_1.VerifyEmailOutput),
+    __param(0, (0, graphql_1.Args)('input')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [verify_email_dto_1.VerifyEmailInput]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "verifyEmail", null);
 UserResolver = __decorate([
     (0, graphql_1.Resolver)((of) => user_entity_1.User),
     __metadata("design:paramtypes", [user_service_1.UserService])

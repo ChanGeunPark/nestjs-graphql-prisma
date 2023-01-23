@@ -5,10 +5,13 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserInput } from './dto/create-user.input';
 import { LoginInput } from './dto/login.dto';
 import { EditProfileInput } from './dto/edit-profile.dto';
-
-import * as bcrypt from 'bcrypt';
 import { JwtService } from 'src/jwt/jwt.service';
-import { User } from 'src/interfaces/users';
+
+// ilb
+import { v4 as uuidv4 } from 'uuid';
+import * as bcrypt from 'bcrypt';
+import { UserProfileOutput } from './dto/user-profile.dto';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class UserService {
@@ -16,6 +19,7 @@ export class UserService {
     private prisma: PrismaService,
     // private readonly config: ConfigService,// global config 어디서나 가져올 수 있다.
     private readonly jwtService: JwtService,
+    private readonly mailService: MailService,
   ) {}
 
   async create({
@@ -29,6 +33,7 @@ export class UserService {
           email,
         },
       });
+
       if (exists) {
         return { ok: false, error: 'There is a user with that email already' };
       }
@@ -36,13 +41,27 @@ export class UserService {
       // 비밀번호를 암호화한다.
       const hashPassword = await bcrypt.hash(password, 10);
 
-      await this.prisma.user.create({
+      const user = await this.prisma.user.create({
         data: {
           email,
           password: hashPassword,
           role,
         },
       });
+
+      const verification = await this.prisma.verification.create({
+        data: {
+          code: uuidv4().replace(/-/g, ''),
+          user: {
+            connect: {
+              id: user.id,
+            },
+          },
+        },
+      });
+
+      this.mailService.sendVerificationEmail(user.email, verification.code);
+
       return { ok: true };
     } catch (e) {
       return { ok: false, error: "Couldn't create account" };
@@ -101,12 +120,23 @@ export class UserService {
     return `This action removes a #${id} user`;
   }
 
-  async findById(id: number): Promise<User> {
-    return this.prisma.user.findUnique({
-      where: {
-        id,
-      },
-    });
+  async findById(id: number): Promise<UserProfileOutput> {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: {
+          id,
+        },
+      });
+
+      if (user) {
+        return {
+          ok: true,
+          user,
+        };
+      }
+    } catch (error) {
+      return { ok: false, error: 'User not found' };
+    }
   }
 
   async editProfile(userId: number, editProfileInput: EditProfileInput) {
@@ -116,9 +146,23 @@ export class UserService {
           id: userId,
         },
       });
-      if (user) {
-        const hashPassword = await bcrypt.hash(editProfileInput.password, 10);
 
+      // 이메일이 변경되었을 경우에만 인증코드를 생성한다.
+      if (user && user.email !== editProfileInput.email) {
+        const hashPassword = await bcrypt.hash(editProfileInput.password, 10);
+        const verification = await this.prisma.verification.create({
+          data: {
+            code: uuidv4().replace(/-/g, ''),
+            user: {
+              connect: {
+                id: user.id,
+              },
+            },
+          },
+        });
+        this.mailService.sendVerificationEmail(user.email, verification.code);
+
+        // 이메일과 비밀번호를 변경한다.
         await this.prisma.user.update({
           where: {
             id: userId,
@@ -136,6 +180,47 @@ export class UserService {
       return {
         ok: false,
         error: "Couldn't update profile",
+      };
+    }
+  }
+
+  // 이메일 인증
+  async verifyEmail(code: string): Promise<{ ok: boolean; error?: string }> {
+    const verification = await this.prisma.verification.findFirst({
+      where: {
+        code,
+      },
+      include: {
+        user: true,
+      },
+    });
+    try {
+      if (verification) {
+        await this.prisma.user.update({
+          where: {
+            id: verification.user.id,
+          },
+          data: {
+            verified: true,
+          },
+        });
+
+        // 인증하면 코드 지우기
+        await this.prisma.verification.delete({
+          where: {
+            id: verification.id,
+          },
+        });
+
+        return {
+          ok: true,
+        };
+      }
+      return { ok: false, error: 'Verification not found' };
+    } catch (error) {
+      return {
+        ok: false,
+        error,
       };
     }
   }
