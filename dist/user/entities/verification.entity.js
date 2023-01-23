@@ -18,6 +18,10 @@ __decorate([
     (0, graphql_1.Field)(() => String),
     __metadata("design:type", String)
 ], Verification.prototype, "code", void 0);
+__decorate([
+    (0, graphql_1.Field)(() => Number),
+    __metadata("design:type", Number)
+], Verification.prototype, "userId", void 0);
 Verification = __decorate([
     (0, graphql_1.ObjectType)()
 ], Verification);

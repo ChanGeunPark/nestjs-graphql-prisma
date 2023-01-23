@@ -4,6 +4,7 @@ import { CreateUserOutput, CreateUserInput } from './dto/create-user.input';
 import { LoginInput, LoginOutput } from './dto/login.dto';
 import { UserProfileInput, UserProfileOutput } from './dto/user-profile.dto';
 import { EditProfileInput, EditProfileOutput } from './dto/edit-profile.dto';
+import { VerifyEmailInput, VerifyEmailOutput } from './dto/verify-email.dto';
 export declare class UserResolver {
     private readonly userService;
     constructor(userService: UserService);
@@ -14,4 +15,5 @@ export declare class UserResolver {
     userProfile(userProfileInput: UserProfileInput): Promise<UserProfileOutput>;
     editProfile(authUser: User, editProfileInput: EditProfileInput): Promise<EditProfileOutput>;
     removeUser(id: number): string;
+    verifyEmail(verifyEmailInput: VerifyEmailInput): Promise<VerifyEmailOutput>;
 }

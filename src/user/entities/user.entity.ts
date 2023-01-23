@@ -18,6 +18,9 @@ export class User extends CoreEntity {
   @Field((type) => String)
   password: string;
 
+  @Field((type) => Boolean)
+  verified?: boolean;
+
   @Field((type) => UserRole)
   role: 'Client' | 'Owner' | 'Delivery';
 }

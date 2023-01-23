@@ -15,6 +15,8 @@ import { JwtModule } from './jwt/jwt.module';
 import * as Joi from 'joi';
 import { JwtMiddleWare } from './jwt/jwt.middleware';
 import { AuthModule } from './auth/auth.module';
+import { ApolloServerPluginLandingPageLocalDefault } from 'apollo-server-core';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -28,15 +30,18 @@ import { AuthModule } from './auth/auth.module';
         // 환경변수 유효성 검사
         DATABASE_URL: Joi.string().required(),
         PRIVATE_KEY: Joi.string().required(),
+        MAIL_API_KEY: Joi.string().required(),
+        MAIL_DOMAIN_NAME: Joi.string().required(),
+        MAIL_FROM_EMAIL: Joi.string().required(),
       }),
     }),
 
-    //forRoot() 는 GraphQLModule 의 설정을 할 수 있는 메소드이다.
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
-
+      playground: false,
       autoSchemaFile: true,
       // autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      plugins: [ApolloServerPluginLandingPageLocalDefault()], // apollo server plugin -> ui를 제공해준다.
 
       /**
        * @description context는 어떤 resolver에서든 접근할 수 있다.
@@ -44,11 +49,17 @@ import { AuthModule } from './auth/auth.module';
        */
       context: ({ req }) => ({ user: req['user'] }),
     }),
+
     // 모듈을 dynamic 하게 import 할 수 있게 변경
     JwtModule.forRoot({
       privateKey: process.env.PRIVATE_KEY,
     }),
     UserModule,
+    MailModule.forRoot({
+      apiKey: process.env.MAIL_API_KEY,
+      domain: process.env.MAIL_DOMAIN_NAME,
+      fromEmail: process.env.MAIL_FROM_EMAIL,
+    }),
   ],
   controllers: [],
   providers: [PrismaService],

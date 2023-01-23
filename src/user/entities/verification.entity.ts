@@ -5,4 +5,7 @@ import { CoreEntity } from 'src/common/entities/core.entity';
 export class Verification extends CoreEntity {
   @Field(() => String)
   code: string;
+
+  @Field(() => Number)
+  userId: number;
 }

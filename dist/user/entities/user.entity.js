@@ -30,6 +30,10 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "password", void 0);
 __decorate([
+    (0, graphql_1.Field)((type) => Boolean),
+    __metadata("design:type", Boolean)
+], User.prototype, "verified", void 0);
+__decorate([
     (0, graphql_1.Field)((type) => UserRole),
     __metadata("design:type", String)
 ], User.prototype, "role", void 0);
